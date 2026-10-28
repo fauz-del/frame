@@ -1,0 +1,104 @@
+
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
+import { GripHorizontal, Smartphone } from 'lucide-react'
+import type { DeviceItem } from '../../types/studio'
+import DeviceFrame from './DeviceFrame'
+
+type DeviceCanvasProps = {
+  devices: DeviceItem[]
+  websiteUrl: string
+  selectedDeviceId: number | null
+  background: string
+  backgroundImage: string
+  onSelectDevice: (id: number | null) => void
+  onRemoveDevice: (id: number) => void
+  onMoveDevice: (
+    event: ReactPointerEvent<HTMLButtonElement>,
+    device: DeviceItem,
+  ) => void
+  canvasRef: React.RefObject<HTMLDivElement | null>
+  onAddDevice: () => void
+}
+
+function DeviceCanvas({
+  devices,
+  websiteUrl,
+  selectedDeviceId,
+  background,
+  backgroundImage,
+  onSelectDevice,
+  onRemoveDevice,
+  onMoveDevice,
+  canvasRef,
+  onAddDevice,
+}: DeviceCanvasProps) {
+  const canvasStyle: CSSProperties = backgroundImage
+    ? {
+        backgroundImage: `url("${backgroundImage}")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }
+    : {
+        backgroundColor: background,
+        backgroundImage:
+          'radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1px)',
+        backgroundSize: '20px 20px',
+      }
+
+  return (
+    <div className="min-h-0 flex-1 overflow-auto p-3 sm:p-5">
+      <div
+        ref={canvasRef}
+        className="relative min-h-[600px] min-w-[900px] overflow-hidden rounded-xl border border-black/5 shadow-inner"
+        style={canvasStyle}
+        onPointerDown={(event) => {
+          if (event.target === event.currentTarget) {
+            onSelectDevice(null)
+          }
+        }}
+      >
+        <div className="pointer-events-none absolute left-4 top-4 flex items-center gap-2 rounded-lg bg-black/15 px-3 py-2 text-[10px] text-white/70 backdrop-blur-sm">
+          <GripHorizontal size={13} />
+          Drag device labels to arrange your layout
+        </div>
+
+        {devices.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center p-6">
+            <div className="max-w-xs text-center">
+              <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-white/10 text-white">
+                <Smartphone size={22} />
+              </div>
+              <h2 className="mt-4 text-sm font-semibold text-white">
+                Your canvas is empty
+              </h2>
+              <p className="mt-2 text-xs leading-5 text-white/60">
+                Add a device to start building your presentation.
+              </p>
+              <button
+                type="button"
+                onClick={onAddDevice}
+                className="mt-4 rounded-lg bg-[#E8A08B] px-4 py-2 text-xs font-semibold text-[#24262B] hover:bg-[#F0B5A3]"
+              >
+                Add your first device
+              </button>
+            </div>
+          </div>
+        )}
+
+        {devices.map((device) => (
+          <DeviceFrame
+            key={device.id}
+            device={device}
+            websiteUrl={websiteUrl}
+            selected={device.id === selectedDeviceId}
+            onSelect={() => onSelectDevice(device.id)}
+            onRemove={() => onRemoveDevice(device.id)}
+            onMoveStart={(event) => onMoveDevice(event, device)}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default DeviceCanvas

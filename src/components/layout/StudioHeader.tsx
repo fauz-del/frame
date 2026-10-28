@@ -11,6 +11,7 @@ import WebsiteUrlBar from '../studio/WebsiteUrlBar'
 
 type StudioHeaderProps = {
   projectName?: string
+  websiteUrl: string
   onPreview?: () => void
   onExport?: () => void
   onLoadWebsite: (url: string) => void
@@ -18,13 +19,13 @@ type StudioHeaderProps = {
 
 function StudioHeader({
   projectName = 'Untitled project',
+  websiteUrl,
   onPreview,
   onExport,
   onLoadWebsite,
 }: StudioHeaderProps) {
   return (
     <header className="flex min-h-16 items-center justify-between gap-3 border-b border-[#E5E5DF] bg-white px-3 sm:px-6">
-      {/* Brand and project information */}
       <div className="flex min-w-0 shrink-0 items-center gap-3">
         <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#24262B] text-white">
           <Clapperboard size={19} strokeWidth={1.8} />
@@ -47,19 +48,20 @@ function StudioHeader({
 
         <span
           className="hidden items-center gap-1.5 text-xs text-[#777971] xl:flex"
-          title="Project saving is not connected yet"
+          title="Project saving is stored in this browser"
         >
           <CloudCheck size={15} />
           <span>Local draft</span>
         </span>
       </div>
 
-      {/* Website URL input */}
       <div className="min-w-0 flex-1">
-        <WebsiteUrlBar onLoad={onLoadWebsite} />
+        <WebsiteUrlBar
+          websiteUrl={websiteUrl}
+          onLoad={onLoadWebsite}
+        />
       </div>
 
-      {/* Editor actions */}
       <div className="flex shrink-0 items-center gap-1.5">
         <div className="mr-1 hidden items-center gap-1 sm:flex">
           <button
@@ -90,7 +92,7 @@ function StudioHeader({
           className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-[#E5E5DF] text-[#44453F] transition-colors hover:bg-[#F5F5F1] sm:w-auto sm:px-3"
         >
           <Eye size={16} />
-          <span className="hidden sm:ml-2 sm:inline text-sm font-medium">
+          <span className="hidden text-sm font-medium sm:ml-2 sm:inline">
             Preview
           </span>
         </button>
