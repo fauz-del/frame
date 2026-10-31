@@ -1,21 +1,15 @@
 
-import { useEffect, useState, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Globe, ArrowRight, LoaderCircle } from 'lucide-react'
 
 type WebsiteUrlBarProps = {
-  websiteUrl: string
   onLoad: (url: string) => void
 }
 
-function WebsiteUrlBar({ websiteUrl, onLoad }: WebsiteUrlBarProps) {
-  const [url, setUrl] = useState(websiteUrl)
+function WebsiteUrlBar({ onLoad }: WebsiteUrlBarProps) {
+  const [url, setUrl] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    setUrl(websiteUrl)
-    setError('')
-  }, [websiteUrl])
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -48,11 +42,8 @@ function WebsiteUrlBar({ websiteUrl, onLoad }: WebsiteUrlBarProps) {
     }
 
     setLoading(true)
-
-    const normalizedUrl = parsedUrl.href
-    setUrl(normalizedUrl)
-    onLoad(normalizedUrl)
-
+    onLoad(parsedUrl.href)
+    setUrl(parsedUrl.href)
     setLoading(false)
   }
 

@@ -8,6 +8,7 @@ import {
   Plus,
   Smartphone,
   Tablet,
+  Type,
   Trash2,
   Upload,
 } from 'lucide-react'
@@ -16,16 +17,20 @@ import {
   getDeviceLabel,
   type BackgroundPreset,
   type DeviceItem,
+  type TextItem,
 } from '../../types/studio'
 
 type WorkspaceSidebarProps = {
   devices: DeviceItem[]
+  texts: TextItem[]
   selectedDeviceId: number | null
+  selectedTextId: number | null
   background: string
   customColor: string
   backgroundName: string
   backgroundImage: string
   onSelectDevice: (id: number) => void
+  onSelectText: (id: number) => void
   onRemoveDevice: (id: number) => void
   onAddDevice: () => void
   onChooseBackground: (preset: BackgroundPreset) => void
@@ -35,12 +40,15 @@ type WorkspaceSidebarProps = {
 
 function WorkspaceSidebar({
   devices,
+  texts,
   selectedDeviceId,
+  selectedTextId,
   background,
   customColor,
   backgroundName,
   backgroundImage,
   onSelectDevice,
+  onSelectText,
   onRemoveDevice,
   onAddDevice,
   onChooseBackground,
@@ -137,11 +145,23 @@ function WorkspaceSidebar({
             )
           })}
         </div>
+        {texts.map((item, index) => (
+          <button
+            key={`text-layer-${item.id}`}
+            type="button"
+            onClick={() => onSelectText(item.id)}
+            className={`mt-1 flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-xs ${selectedTextId === item.id ? 'bg-[#F8E6DF] font-medium text-[#9C5845]' : 'text-[#666760] hover:bg-[#F5F5F1]'}`}
+          >
+            <Type size={14} />
+            <span className="min-w-0 flex-1 truncate">Text {index + 1}</span>
+            <span className="text-[10px] opacity-60">{item.fontSize}px</span>
+          </button>
+        ))}
       </section>
 
       <div className="border-t border-[#E5E5DF]" />
 
-      <section className="p-3">
+      <section id="background-settings" className="p-3">
         <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-[#44453F]">
           <Palette size={14} />
           Background

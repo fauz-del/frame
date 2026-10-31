@@ -1,16 +1,26 @@
 
-import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
+import type { CSSProperties, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from 'react'
 import { GripHorizontal, Smartphone } from 'lucide-react'
-import type { DeviceItem } from '../../types/studio'
+import type { DeviceItem, TextItem } from '../../types/studio'
 import DeviceFrame from './DeviceFrame'
 
 type DeviceCanvasProps = {
   devices: DeviceItem[]
+  texts: TextItem[]
   websiteUrl: string
   selectedDeviceId: number | null
+  selectedTextId: number | null
+  activeTool: 'select' | 'pan' | 'text'
+  isPanning: boolean
   background: string
   backgroundImage: string
   onSelectDevice: (id: number | null) => void
+  onSelectText: (id: number) => void
+  onMoveText: (event: ReactPointerEvent<HTMLDivElement>, text: TextItem) => void
+  onAddText: (event: ReactMouseEvent<HTMLDivElement>) => void
+  onPanStart: (event: ReactPointerEvent<HTMLDivElement>) => void
+  onPanMove: (event: ReactPointerEvent<HTMLDivElement>) => void
+  onPanEnd: (event: ReactPointerEvent<HTMLDivElement>) => void
   onRemoveDevice: (id: number) => void
   onMoveDevice: (
     event: ReactPointerEvent<HTMLButtonElement>,
@@ -22,11 +32,21 @@ type DeviceCanvasProps = {
 
 function DeviceCanvas({
   devices,
+  texts,
   websiteUrl,
   selectedDeviceId,
+  selectedTextId,
+  activeTool,
+  isPanning,
   background,
   backgroundImage,
   onSelectDevice,
+  onSelectText,
+  onMoveText,
+  onAddText,
+  onPanStart,
+  onPanMove,
+  onPanEnd,
   onRemoveDevice,
   onMoveDevice,
   canvasRef,
@@ -34,14 +54,16 @@ function DeviceCanvas({
 }: DeviceCanvasProps) {
   const canvasStyle: CSSProperties = backgroundImage
     ? {
+        backgroundColor: background,
         backgroundImage: `url("${backgroundImage}")`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }
     : {
         backgroundColor: background,
-        backgroundImage:
-          'radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1px)',
+        backgroundImage: ['#24262b', '#202124'].includes(background.toLowerCase())
+          ? 'radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1px)'
+          : 'radial-gradient(rgba(0,0,0,0.09) 1px, transparent 1px)',
         backgroundSize: '20px 20px',
       }
 
@@ -49,9 +71,14 @@ function DeviceCanvas({
     <div className="min-h-0 flex-1 overflow-auto p-3 sm:p-5">
       <div
         ref={canvasRef}
-        className="relative min-h-[600px] min-w-[900px] overflow-hidden rounded-xl border border-black/5 shadow-inner"
+        onClick={onAddText}
+        onPointerMove={onPanMove}
+        onPointerUp={onPanEnd}
+        onPointerCancel={onPanEnd}
+        className={`relative min-h-[620px] min-w-[900px] overflow-hidden rounded-xl border border-black/5 shadow-inner ${activeTool === 'pan' ? `cursor-grab touch-none ${isPanning ? 'cursor-grabbing' : ''}` : activeTool === 'text' ? 'cursor-text' : ''}`}
         style={canvasStyle}
         onPointerDown={(event) => {
+          onPanStart(event)
           if (event.target === event.currentTarget) {
             onSelectDevice(null)
           }
@@ -62,7 +89,7 @@ function DeviceCanvas({
           Drag device labels to arrange your layout
         </div>
 
-        {devices.length === 0 && (
+        {devices.length === 0 && texts.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center p-6">
             <div className="max-w-xs text-center">
               <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-white/10 text-white">
@@ -91,10 +118,32 @@ function DeviceCanvas({
             device={device}
             websiteUrl={websiteUrl}
             selected={device.id === selectedDeviceId}
-            onSelect={() => onSelectDevice(device.id)}
+            onSelect={() => {
+              if (activeTool === 'select') onSelectDevice(device.id)
+            }}
             onRemove={() => onRemoveDevice(device.id)}
-            onMoveStart={(event) => onMoveDevice(event, device)}
+            onMoveStart={(event) => {
+              if (activeTool === 'select') onMoveDevice(event, device)
+            }}
           />
+        ))}
+
+        {texts.map((text) => (
+          <div
+            key={text.id}
+            data-text-item
+            onPointerDown={(event) => {
+              if (activeTool === 'select') onMoveText(event, text)
+            }}
+            onClick={(event) => {
+              event.stopPropagation()
+              if (activeTool !== 'pan') onSelectText(text.id)
+            }}
+            className={`absolute whitespace-pre-wrap rounded-sm px-1 ${activeTool === 'select' ? 'cursor-move' : activeTool === 'text' ? 'cursor-text' : ''} ${selectedTextId === text.id ? 'ring-1 ring-[#E8A08B]' : ''}`}
+            style={{ left: text.x, top: text.y, fontSize: text.fontSize, color: text.color }}
+          >
+            {text.text}
+          </div>
         ))}
       </div>
     </div>

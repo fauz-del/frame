@@ -7,9 +7,6 @@ type StudioToolbarProps = {
   deviceType: DeviceType
   onDeviceTypeChange: (type: DeviceType) => void
   onAddDevice: () => void
-  onOpenProjects: () => void
-  onNewProject: () => void
-  onSaveProject: () => void
   onResetCanvas: () => void
 }
 
@@ -18,9 +15,6 @@ function StudioToolbar({
   deviceType,
   onDeviceTypeChange,
   onAddDevice,
-  onOpenProjects,
-  onNewProject,
-  onSaveProject,
   onResetCanvas,
 }: StudioToolbarProps) {
   return (
@@ -35,30 +29,6 @@ function StudioToolbar({
       </div>
 
       <div className="flex flex-wrap items-center gap-1.5">
-        <button
-          type="button"
-          onClick={onOpenProjects}
-          className="h-8 rounded-lg border border-[#E5E5DF] px-3 text-xs font-medium text-[#44453F] hover:bg-[#F5F5F1]"
-        >
-          My Projects
-        </button>
-
-        <button
-          type="button"
-          onClick={onNewProject}
-          className="h-8 rounded-lg border border-[#E5E5DF] px-3 text-xs font-medium text-[#44453F] hover:bg-[#F5F5F1]"
-        >
-          New
-        </button>
-
-        <button
-          type="button"
-          onClick={onSaveProject}
-          className="h-8 rounded-lg bg-[#E8A08B] px-3 text-xs font-semibold text-[#24262B] hover:bg-[#F0B5A3]"
-        >
-          Save
-        </button>
-
         <select
           value={deviceType}
           onChange={(event) =>

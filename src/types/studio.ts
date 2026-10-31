@@ -9,6 +9,15 @@ export type DeviceItem = {
   y: number
 }
 
+export type TextItem = {
+  id: number
+  text: string
+  x: number
+  y: number
+  fontSize: number
+  color: string
+}
+
 export type BackgroundPreset = {
   name: string
   value: string

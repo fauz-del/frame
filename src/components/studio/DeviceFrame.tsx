@@ -1,7 +1,7 @@
 
 import { GripHorizontal, Monitor, Smartphone, Tablet, Trash2 } from 'lucide-react'
 import type { DeviceItem } from '../../types/studio'
-import { getDeviceHeight, getDeviceLabel } from '../../types/studio'
+import { getDeviceLabel } from '../../types/studio'
 
 type DeviceFrameProps = {
   device: DeviceItem
@@ -22,7 +22,11 @@ function DeviceFrame({
 }: DeviceFrameProps) {
   const isPhone = device.type === 'phone'
   const isTablet = device.type === 'tablet'
-  const height = getDeviceHeight(device.type)
+  const height = device.type === 'phone'
+    ? device.width * 1.85
+    : device.type === 'tablet'
+      ? device.width * 0.76
+      : device.width * 0.57
 
   const DeviceIcon = isPhone ? Smartphone : isTablet ? Tablet : Monitor
 

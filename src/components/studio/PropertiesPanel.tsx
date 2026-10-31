@@ -1,10 +1,13 @@
 
-import { Monitor, Settings2, Smartphone, Tablet, Trash2 } from 'lucide-react'
-import type { DeviceItem, DeviceType } from '../../types/studio'
-import { getDeviceHeight, getDeviceLabel } from '../../types/studio'
+import { Monitor, Settings2, Smartphone, Tablet, Trash2, Type } from 'lucide-react'
+import type { DeviceItem, DeviceType, TextItem } from '../../types/studio'
+import { getDeviceLabel } from '../../types/studio'
 
 type PropertiesPanelProps = {
   device: DeviceItem | null
+  text: TextItem | null
+  onUpdateText: (updates: Partial<TextItem>) => void
+  onRemoveText: () => void
   onChangeType: (type: DeviceType) => void
   onChangeWidth: (width: number) => void
   onRemove: () => void
@@ -13,6 +16,9 @@ type PropertiesPanelProps = {
 
 function PropertiesPanel({
   device,
+  text,
+  onUpdateText,
+  onRemoveText,
   onChangeType,
   onChangeWidth,
   onRemove,
@@ -27,7 +33,32 @@ function PropertiesPanel({
         <Settings2 size={15} className="text-[#777971]" />
       </div>
 
-      {device ? (
+      {text ? (
+        <div className="space-y-5 p-4">
+          <div className="flex items-center gap-2 rounded-lg border border-[#E5E5DF] p-3">
+            <Type size={16} />
+            <span className="text-sm font-medium">Text layer</span>
+          </div>
+          <section>
+            <label htmlFor="text-content" className="mb-2 block text-[11px] font-medium text-[#777971]">Content</label>
+            <textarea id="text-content" value={text.text} onChange={(event) => onUpdateText({ text: event.target.value })} rows={3} className="w-full resize-y rounded-lg border border-[#E5E5DF] p-2 text-sm" />
+          </section>
+          <section>
+            <div className="mb-2 flex items-center justify-between">
+              <label htmlFor="text-size" className="text-[11px] font-medium text-[#777971]">Font size</label>
+              <span className="text-xs font-semibold tabular-nums text-[#44453F]">{text.fontSize}px</span>
+            </div>
+            <input id="text-size" type="range" min="12" max="72" value={text.fontSize} onChange={(event) => onUpdateText({ fontSize: Number(event.target.value) })} className="w-full accent-[#E8A08B]" />
+          </section>
+          <section>
+            <label htmlFor="text-color" className="mb-2 block text-[11px] font-medium text-[#777971]">Text color</label>
+            <input id="text-color" type="color" value={text.color} onChange={(event) => onUpdateText({ color: event.target.value })} className="h-9 w-full rounded-lg border border-[#E5E5DF] bg-white p-1" />
+          </section>
+          <button type="button" onClick={onRemoveText} className="flex h-9 w-full items-center justify-center gap-2 rounded-lg border border-red-200 text-xs font-medium text-red-500 hover:bg-red-50">
+            <Trash2 size={14} /> Remove text
+          </button>
+        </div>
+      ) : device ? (
         <div className="space-y-5 p-4">
           <section>
             <label
@@ -118,7 +149,7 @@ function PropertiesPanel({
             <div className="flex items-center justify-between gap-2">
               <span className="text-[10px] text-[#777971]">Height</span>
               <span className="text-[10px] font-medium text-[#44453F]">
-                {getDeviceHeight(device.type)} px
+                {Math.round(device.type === 'phone' ? device.width * 1.85 : device.type === 'tablet' ? device.width * 0.76 : device.width * 0.57)} px
               </span>
             </div>
             <div className="flex items-center justify-between gap-2">
